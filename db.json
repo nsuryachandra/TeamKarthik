@@ -1,0 +1,26 @@
+{
+  "activities": [],
+  "updates": [],
+  "registrations": [],
+  "gallery": [],
+  "config": {
+    "hero": {
+      "headline": "Empowering the next generation. Driving real grassroots impact.",
+      "mission": "We are an active student and youth movement on a continuous mission visiting colleges, schools, and communities to spark career development, civic leadership, and transparent community service.",
+      "primaryCtaText": "Join Team Karthik",
+      "secondaryCtaText": "Explore Activities"
+    },
+    "stats": {
+      "collegesRoamed": 0,
+      "issuesRaised": 0,
+      "instantlySolved": 0
+    },
+    "featuredActivityId": ""
+  },
+  "reports": [],
+  "programs": [],
+  "timeline": [],
+  "successStories": [],
+  "coverageLocations": [],
+  "annualReports": []
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Team Karthik Platform",
+  "description": "A premium digital presence and activity tracking platform for Team Karthik, a highly active youth and student engagement organization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

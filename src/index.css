@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Poppins", sans-serif;
+  --font-serif: "Poppins", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --color-primary: #0f172a; /* Slate 900 for premium contrast */
+  --color-primary-light: #f8fafc;
+  --color-primary-dark: #020617;
+  --color-accent: #ff3b30; /* Red/coral accent */
+  --color-accent-dark: #b45309; /* Deep Bronze */
+  --color-accent-light: #fef3c7; /* Champagne */
+  
+  --shadow-premium: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
+  --shadow-glow: 0 0 35px rgba(30, 58, 138, 0.04);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #f8fafc; /* Clean Light slate */
+  color: #1e293b; /* Slate 800 */
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+/* Elite Glass Effects & Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(15, 23, 42, 0.04);
+}
+
+.glass-panel-dark {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-emerald {
+  background: linear-gradient(135deg, #0f766e 0%, #13b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Luxurious Section Separator line */
+.section-barrier {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(30, 58, 138, 0.1) 15%, rgba(15, 23, 42, 0.05) 50%, rgba(30, 58, 138, 0.1) 85%, transparent);
+  width: 100%;
+}
+
+/* Dotted Dot Matrix Canvas for modern look */
+.mesh-grid {
+  background-image: radial-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Custom premium hover and focus indicators */
+.transition-luxury {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.radial-glow-primary {
+  background: radial-gradient(circle, rgba(30, 58, 138, 0.02) 0%, transparent 70%);
+}
+
+.radial-glow-emerald {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.02) 0%, transparent 70%);
+}
+
+.card-glow-hover {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-glow-hover::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.06) 0%, transparent 60%);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-glow-hover:hover::after {
+  opacity: 1;
+}
+
+
+
