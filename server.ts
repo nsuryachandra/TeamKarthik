@@ -871,29 +871,34 @@ Please write a structured event briefing in Markdown:
   });
 
 
-  // 8. Serve built assets in production, otherwise mount Vite middlewares
-  if (!process.env.VERCEL) {
-    const PORT = process.env.PORT || 3000;
-    if (process.env.NODE_ENV === "production") {
-      const distPath = path.join(ROOT_DIR, "dist");
-      app.use(express.static(distPath));
-      app.get("*", (req, res) => {
-        res.sendFile(path.join(distPath, "index.html"));
+  // 8. Serve built assets in production / Vercel, otherwise mount Vite middlewares
+  if (!process.env.VERCEL && process.env.NODE_ENV !== "production") {
+    // Development mode: use Vite middlewares
+    createViteServer({
+      server: { middlewareMode: true },
+      appType: "spa",
+    }).then((vite) => {
+      app.use(vite.middlewares);
+      const PORT = process.env.PORT || 3000;
+      app.listen(Number(PORT), "0.0.0.0", () => {
+        console.log(`Development server running on http://localhost:${PORT}`);
       });
+    }).catch((err) => {
+      console.error("Vite startup failed:", err);
+    });
+  } else {
+    // Production / Vercel: serve built static assets
+    const distPath = path.join(ROOT_DIR, "dist");
+    app.use(express.static(distPath));
+    // SPA fallback for non-API routes
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+    // Start listening only when not on Vercel
+    if (!process.env.VERCEL) {
+      const PORT = process.env.PORT || 3000;
       app.listen(Number(PORT), "0.0.0.0", () => {
         console.log(`Production server running on http://localhost:${PORT}`);
-      });
-    } else {
-      createViteServer({
-        server: { middlewareMode: true },
-        appType: "spa",
-      }).then((vite) => {
-        app.use(vite.middlewares);
-        app.listen(Number(PORT), "0.0.0.0", () => {
-          console.log(`Development server running on http://localhost:${PORT}`);
-        });
-      }).catch((err) => {
-        console.error("Vite startup failed:", err);
       });
     }
   }
