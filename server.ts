@@ -233,11 +233,9 @@ if (dbChanged) {
   saveDatabase(db);
 }
 
-async function startServer() {
-  const app = express();
-  app.use(express.json());
-
-  const PORT = 3000;
+const app = express();
+app.use(express.json());
+export { app };
 
   // 1. API: HEALTH CHECK
   app.get("/api/health", (req, res) => {
@@ -874,25 +872,30 @@ Please write a structured event briefing in Markdown:
 
 
   // 8. Serve built assets in production, otherwise mount Vite middlewares
-  if (process.env.NODE_ENV === "production") {
-    const distPath = path.join(ROOT_DIR, "dist");
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
-  } else {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
+  if (!process.env.VERCEL) {
+    const PORT = process.env.PORT || 3000;
+    if (process.env.NODE_ENV === "production") {
+      const distPath = path.join(ROOT_DIR, "dist");
+      app.use(express.static(distPath));
+      app.get("*", (req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
+      app.listen(Number(PORT), "0.0.0.0", () => {
+        console.log(`Production server running on http://localhost:${PORT}`);
+      });
+    } else {
+      createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+      }).then((vite) => {
+        app.use(vite.middlewares);
+        app.listen(Number(PORT), "0.0.0.0", () => {
+          console.log(`Development server running on http://localhost:${PORT}`);
+        });
+      }).catch((err) => {
+        console.error("Vite startup failed:", err);
+      });
+    }
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server launched on http://localhost:${PORT}`);
-  });
-}
-
-startServer().catch((e) => {
-  console.error("Failed to start custom backend server: ", e);
-});
+  export default app;
