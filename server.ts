@@ -7,7 +7,26 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const ROOT_DIR = process.cwd();
-const DB_PATH = path.join(ROOT_DIR, "db.json");
+
+function findDbPath() {
+  const paths = [
+    path.join(process.cwd(), "db.json"),
+    path.join(__dirname, "../db.json"),
+    path.join(__dirname, "db.json"),
+    path.join(__dirname, "../../db.json"),
+    path.join(process.cwd(), "../db.json"),
+  ];
+  for (const p of paths) {
+    if (fs.existsSync(p)) {
+      console.log("Found db.json at:", p);
+      return p;
+    }
+  }
+  console.warn("Could not find db.json in any checked location, using fallback:", paths);
+  return path.join(process.cwd(), "db.json");
+}
+
+const DB_PATH = findDbPath();
 
 // Helper to initialize database with high-quality mock data of Team Karthik if it doesn't exist
 function initDatabase() {
@@ -956,7 +975,25 @@ Please write a structured event briefing in Markdown:
     });
   } else {
     // Production / Vercel: serve built static assets
-    const distPath = path.join(ROOT_DIR, "dist");
+    function findDistPath() {
+      const paths = [
+        path.join(process.cwd(), "dist"),
+        path.join(__dirname, "../dist"),
+        path.join(__dirname, "dist"),
+        path.join(__dirname, "."),
+        path.join(process.cwd(), "../dist"),
+      ];
+      for (const p of paths) {
+        if (fs.existsSync(path.join(p, "index.html"))) {
+          console.log("Found dist folder at:", p);
+          return p;
+        }
+      }
+      console.error("Could not find dist folder in any checked location:", paths);
+      return path.join(process.cwd(), "dist");
+    }
+
+    const distPath = findDistPath();
     app.use(express.static(distPath));
     // SPA fallback
     app.get("*", (req, res) => {
