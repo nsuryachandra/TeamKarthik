@@ -9,6 +9,8 @@ import Reports from "./pages/Reports";
 import Timeline from "./pages/Timeline";
 import Updates from "./pages/Updates";
 import Members from "./pages/Members";
+import AdminLoginModal from "./components/AdminLoginModal";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Award,
   Menu,
@@ -27,7 +29,10 @@ import {
   UserPlus
 } from "lucide-react";
 export default function App() {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(() => {
+    return sessionStorage.getItem("isAdmin") === "true";
+  });
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState("home");
   const [config, setConfig] = useState(null);
@@ -131,6 +136,23 @@ export default function App() {
     setIsAdmin(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  const handleAdminToggle = () => {
+    if (isAdmin) {
+      setIsAdmin(false);
+      sessionStorage.removeItem("isAdmin");
+    } else {
+      const hasSession = sessionStorage.getItem("isAdmin") === "true";
+      if (hasSession) {
+        setIsAdmin(true);
+      } else {
+        setLoginModalOpen(true);
+      }
+    }
+  };
+  const handleLoginSuccess = (token) => {
+    setIsAdmin(true);
+    sessionStorage.setItem("isAdmin", "true");
+  };
   if (loading || !config) {
     return <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center space-y-4">
         <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-premium animate-pulse border border-slate-200">
@@ -153,206 +175,319 @@ export default function App() {
     { label: "AI Reports Library", page: "reports", num: "08", icon: FileText },
     { label: "Register / Join Us", page: "join-us", num: "09", icon: UserPlus }
   ];
-  return <div className="min-h-screen bg-[#f8fafc] flex flex-col justify-between selection:bg-accent selection:text-white">
-      
-      {
-    /* ==================== 1. COMPACT BRAND HEADER WITH LEFT MENU ==================== */
-  }
-      <header className="bg-white border-b border-slate-200/60 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex justify-between items-center">
-          
-          <div className="flex items-center gap-4">
-            {
-    /* Hamburger Button on Left */
-  }
-            <button
-    onClick={() => setMenuOpen(true)}
-    className="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl cursor-pointer text-slate-800 transition-all hover:scale-105"
-  >
-              <Menu className="w-5 h-5" />
-            </button>
-
-            <div
-    onClick={() => navigateToPage("home")}
-    className="flex items-center gap-3 cursor-pointer group text-left"
-  >
-              <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 shadow-sm relative bg-slate-50">
-                <img
-    src="/team_logo.jpg"
-    alt="Team Karthik logo"
-    className="w-full h-full object-cover"
-  />
-              </div>
-              <div className="hidden xs:block">
-                <span className="font-display font-black text-sm sm:text-base tracking-tight uppercase text-slate-900 group-hover:text-accent transition-colors">
-                  Team<span className="text-accent ml-0.5">Karthik</span>
-                </span>
-                <span className="text-[7.5px] font-mono tracking-widest uppercase text-slate-500 font-bold block -mt-0.5">
-                  TRS STUDENT WING
-                </span>
-              </div>
+  return <div className="min-h-screen bg-[#f8fafc] flex selection:bg-accent selection:text-white w-full">
+      {/* ==================== 1. PERSISTENT SIDEBAR ON DESKTOP ==================== */}
+      <aside className="hidden lg:flex flex-col justify-between w-72 bg-white border-r border-slate-200/80 h-screen sticky top-0 shrink-0 z-30 p-6 text-left">
+        <div className="space-y-8">
+          {/* Brand Header */}
+          <div onClick={() => navigateToPage("home")} className="flex items-center gap-3 cursor-pointer group text-left">
+            <div className="w-12 h-12 rounded-2xl overflow-hidden border border-slate-200 shadow-sm relative bg-slate-50 p-0.5 group-hover:scale-105 transition-transform">
+              <img src="/team_logo.jpg" alt="Logo" className="w-full h-full object-cover rounded-xl" />
+            </div>
+            <div>
+              <span className="font-display font-black text-base tracking-tight uppercase text-slate-900 group-hover:text-accent transition-colors">
+                Team<span className="text-accent ml-0.5">Karthik</span>
+              </span>
+              <span className="text-[8px] font-mono tracking-widest uppercase text-slate-500 font-bold block -mt-0.5">
+                TRS STUDENT WING
+              </span>
             </div>
           </div>
-          
-          <div className="flex items-center gap-3">
-            <button
-    onClick={() => setIsAdmin(!isAdmin)}
-    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold uppercase border transition-all duration-300 cursor-pointer ${isAdmin ? "bg-amber-100 text-amber-800 border-amber-200" : "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200"}`}
-  >
-              <div className={`w-1.5 h-1.5 rounded-full ${isAdmin ? "bg-amber-500" : "bg-slate-400"} animate-ping mr-0.5`} />
-              {isAdmin ? "Admin Desk" : "Admin Panel"}
-            </button>
-          </div>
-        </div>
-      </header>
 
-      {
-    /* ==================== 2. MAIN APP PORT ==================== */
-  }
-      <main className="flex-grow">
-        {isAdmin ? <Admin
-    activities={activities}
-    updates={updates}
-    registrations={registrations}
-    gallery={gallery}
-    config={config}
-    reports={reports}
-    programs={programs}
-    timeline={timeline}
-    successStories={successStories}
-    coverageLocations={coverageLocations}
-    annualReports={annualReports}
-    onUpdateActivities={setActivities}
-    onUpdateUpdates={setUpdates}
-    onUpdateRegistrations={setRegistrations}
-    onUpdateGallery={setGallery}
-    onUpdateConfig={setConfig}
-    onUpdateReports={setReports}
-    onUpdatePrograms={setPrograms}
-    onUpdateTimeline={setTimeline}
-    onUpdateSuccessStories={setSuccessStories}
-    onUpdateCoverageLocations={setCoverageLocations}
-    onUpdateAnnualReports={setAnnualReports}
-  /> : <div>
-            {currentPage === "home" && <Home
-    activities={activities}
-    updates={updates}
-    config={config}
-    reports={reports}
-    programs={programs}
-    onNavigatePage={navigateToPage}
-  />}
-            {currentPage === "stats" && <ImpactDashboard
-    config={config}
-    coverageLocations={coverageLocations}
-    activities={activities}
-    reports={reports}
-    programs={programs}
-  />}
-            {currentPage === "about" && <About />}
-            {currentPage === "members" && <Members />}
-            {currentPage === "programs" && <Programs
-    programs={programs}
-    activities={activities}
-    reports={reports}
-  />}
-            {currentPage === "timeline" && <Timeline
-    activities={activities}
-    programs={programs}
-  />}
-            {currentPage === "updates" && <Updates
-    updates={updates}
-  />}
-            {currentPage === "reports" && <Reports
-    reports={reports}
-    activities={activities}
-    programs={programs}
-  />}
-            {currentPage === "join-us" && <Join />}
-          </div>}
-      </main>
+          {/* Divider */}
+          <div className="h-[1px] w-full bg-slate-100" />
 
-      {
-    /* ==================== 3. LEFT-SIDE NAV DRAWER OVERLAY ==================== */
-  }
-      {menuOpen && <div className="fixed inset-0 z-50 flex justify-start bg-slate-955/40 backdrop-blur-xs transition-opacity duration-300">
-          <div className="absolute inset-0" onClick={() => setMenuOpen(false)} />
-          <div className="relative w-80 max-w-full h-full bg-gradient-to-b from-[#fafaf9] via-white to-[#f5f5f4] shadow-2xl flex flex-col justify-between p-6 border-r border-slate-150 animate-slide-in-left">
-            
-            <div className="space-y-6 text-left">
-              <div className="flex justify-between items-center pb-4">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 shadow-sm bg-white p-0.5">
-                    <img src="/team_logo.jpg" alt="Logo" className="w-full h-full object-cover rounded-full" />
-                  </div>
-                  <div>
-                    <span className="font-display font-extrabold text-sm uppercase tracking-tight text-slate-950 block leading-none">Team Karthik</span>
-                    <span className="text-[7.5px] font-mono tracking-widest uppercase text-slate-400 font-bold block mt-0.5">TRS Student Wing</span>
-                  </div>
-                </div>
+          {/* Navigation links */}
+          <nav className="flex flex-col gap-1.5">
+            {navItems.map((item, idx) => {
+              const Icon = item.icon;
+              const isActive = currentPage === item.page && !isAdmin;
+              return (
                 <button
-    onClick={() => setMenuOpen(false)}
-    className="text-slate-400 hover:text-slate-800 p-1.5 rounded-lg hover:bg-slate-100/50 cursor-pointer transition-colors"
-  >
-                  <X className="w-4.5 h-4.5" />
+                  key={idx}
+                  onClick={() => navigateToPage(item.page)}
+                  className={`group relative flex items-center justify-between pl-4 pr-3 py-3 rounded-2xl transition-all duration-300 w-full text-left cursor-pointer ${
+                    isActive 
+                      ? "bg-slate-50 text-slate-950 font-bold" 
+                      : "text-[#64748b] hover:bg-slate-50/70 hover:text-slate-955"
+                  }`}
+                >
+                  <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-r-md transition-all duration-300 ${isActive ? "h-6 bg-accent" : "h-0 group-hover:h-6 bg-accent/60"}`} />
+                  <div className="flex items-center gap-3.5">
+                    <Icon className={`w-4 h-4 transition-all duration-300 ${isActive ? "text-accent scale-105" : "text-slate-400 group-hover:text-slate-900 group-hover:scale-105"}`} />
+                    <span className="text-[11px] font-display font-bold uppercase tracking-widest">
+                      {item.label}
+                    </span>
+                  </div>
+                  <span className={`text-[9px] font-mono transition-colors font-semibold ${isActive ? "text-accent" : "text-slate-350 group-hover:text-accent"}`}>
+                    {item.num}
+                  </span>
                 </button>
-              </div>
+              );
+            })}
+          </nav>
+        </div>
 
-              {
-    /* Decorative Subtle Line */
-  }
-              <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+        {/* Admin button and footer info */}
+        <div className="pt-6 border-t border-slate-100 space-y-4">
+          <button
+            onClick={handleAdminToggle}
+            className={`w-full font-mono font-bold text-[10px] uppercase tracking-widest py-3.5 rounded-2xl transition-all duration-300 cursor-pointer text-center shadow-md ${
+              isAdmin 
+                ? "bg-amber-100 text-amber-900 hover:bg-amber-200/80 shadow-amber-900/5" 
+                : "bg-slate-950 hover:bg-slate-900 text-white shadow-slate-900/10"
+            } hover:scale-[1.01]`}
+          >
+            {isAdmin ? "Exit Admin Desk" : "Admin Panel Access"}
+          </button>
+          <p className="text-[8px] font-mono text-slate-400 text-center leading-normal">
+            Team Karthik Platform v2.0
+          </p>
+        </div>
+      </aside>
 
-              {
-    /* Premium Styled Left Nav Bar Menu */
-  }
-              <nav className="flex flex-col gap-1">
-                {navItems.map((item, idx) => {
-    const Icon = item.icon;
-    return <button
-      key={idx}
-      onClick={() => {
-        navigateToPage(item.page);
-        setMenuOpen(false);
-      }}
-      className="group relative flex items-center justify-between pl-4 pr-3 py-3 rounded-xl hover:bg-slate-955/[0.02] transition-all duration-300 w-full text-left cursor-pointer"
-    >
-                      {
-      /* Active/Hover Left Indicator Bar */
-    }
-                      <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-r-md transition-all duration-300 ${currentPage === item.page ? "h-6 bg-accent" : "h-0 group-hover:h-6 bg-accent/60"}`} />
-                      
-                      <div className="flex items-center gap-3.5">
-                        <Icon className={`w-4 h-4 transition-all duration-300 ${currentPage === item.page ? "text-accent scale-105" : "text-slate-400 group-hover:text-slate-900 group-hover:scale-105"}`} />
-                        <span className={`text-[11px] font-display font-bold uppercase tracking-widest transition-colors ${currentPage === item.page ? "text-slate-950" : "text-[#475569] group-hover:text-slate-955"}`}>
-                          {item.label}
-                        </span>
-                      </div>
-                      <span className={`text-[9px] font-mono transition-colors font-semibold ${currentPage === item.page ? "text-accent" : "text-slate-350 group-hover:text-accent"}`}>
-                        {item.num}
-                      </span>
-                    </button>;
-  })}
-              </nav>
-            </div>
-
-            <div className="pt-6 border-t border-slate-150 space-y-4">
+      {/* ==================== 2. MAIN CONTENT AREA ==================== */}
+      <div className="flex-grow flex flex-col min-w-0 min-h-screen justify-between w-full">
+        {/* Mobile Header */}
+        <header className="lg:hidden bg-white border-b border-slate-200/60 sticky top-0 z-40">
+          <div className="px-4 sm:px-6 h-16 flex justify-between items-center">
+            <div className="flex items-center gap-4 text-left">
               <button
-    onClick={() => {
-      setIsAdmin(!isAdmin);
-      setMenuOpen(false);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }}
-    className="w-full bg-slate-950 hover:bg-slate-900 text-white font-mono font-bold text-[10px] uppercase tracking-widest py-3.5 rounded-xl transition-all duration-300 cursor-pointer text-center shadow-md shadow-slate-900/10 hover:scale-[1.01]"
-  >
-                {isAdmin ? "Exit Admin Desk" : "Admin Panel Access"}
+                onClick={() => setMenuOpen(true)}
+                className="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl cursor-pointer text-slate-800 transition-all hover:scale-105"
+              >
+                <Menu className="w-5 h-5" />
               </button>
-              <p className="text-[8.5px] font-mono text-slate-400 text-center leading-normal">
-                Team Karthik Youth Coordinator Platform
-              </p>
+
+              <div onClick={() => navigateToPage("home")} className="flex items-center gap-3 cursor-pointer text-left">
+                <div className="w-9 h-9 rounded-full overflow-hidden border border-slate-200 shadow-sm relative bg-slate-50">
+                  <img src="/team_logo.jpg" alt="Team Karthik logo" className="w-full h-full object-cover" />
+                </div>
+                <div>
+                  <span className="font-display font-black text-xs sm:text-sm tracking-tight uppercase text-slate-900">
+                    Team<span className="text-accent ml-0.5">Karthik</span>
+                  </span>
+                  <span className="text-[6.5px] font-mono tracking-widest uppercase text-slate-505 font-bold block -mt-1">
+                    TRS STUDENT WING
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleAdminToggle}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase border transition-all duration-300 cursor-pointer ${
+                  isAdmin 
+                    ? "bg-amber-100 text-amber-800 border-amber-200" 
+                    : "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200"
+                }`}
+              >
+                <div className={`w-1 h-1 rounded-full ${isAdmin ? "bg-amber-500" : "bg-slate-400"} animate-ping mr-0.5`} />
+                {isAdmin ? "Admin Desk" : "Admin Panel"}
+              </button>
             </div>
           </div>
-        </div>}
+        </header>
+
+        {/* Animated Main Content Wrapper */}
+        <main className="flex-grow">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={isAdmin ? "admin" : currentPage}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="w-full h-full"
+            >
+              {isAdmin ? (
+                <Admin
+                  activities={activities}
+                  updates={updates}
+                  registrations={registrations}
+                  gallery={gallery}
+                  config={config}
+                  reports={reports}
+                  programs={programs}
+                  timeline={timeline}
+                  successStories={successStories}
+                  coverageLocations={coverageLocations}
+                  annualReports={annualReports}
+                  onUpdateActivities={setActivities}
+                  onUpdateUpdates={setUpdates}
+                  onUpdateRegistrations={setRegistrations}
+                  onUpdateGallery={setGallery}
+                  onUpdateConfig={setConfig}
+                  onUpdateReports={setReports}
+                  onUpdatePrograms={setPrograms}
+                  onUpdateTimeline={setTimeline}
+                  onUpdateSuccessStories={setSuccessStories}
+                  onUpdateCoverageLocations={setCoverageLocations}
+                  onUpdateAnnualReports={setAnnualReports}
+                />
+              ) : (
+                <div>
+                  {currentPage === "home" && (
+                    <Home
+                      activities={activities}
+                      updates={updates}
+                      config={config}
+                      reports={reports}
+                      programs={programs}
+                      onNavigatePage={navigateToPage}
+                    />
+                  )}
+                  {currentPage === "stats" && (
+                    <ImpactDashboard
+                      config={config}
+                      coverageLocations={coverageLocations}
+                      activities={activities}
+                      reports={reports}
+                      programs={programs}
+                    />
+                  )}
+                  {currentPage === "about" && <About />}
+                  {currentPage === "members" && <Members />}
+                  {currentPage === "programs" && (
+                    <Programs
+                      programs={programs}
+                      activities={activities}
+                      reports={reports}
+                    />
+                  )}
+                  {currentPage === "timeline" && (
+                    <Timeline
+                      activities={activities}
+                      programs={programs}
+                    />
+                  )}
+                  {currentPage === "updates" && (
+                    <Updates
+                      updates={updates}
+                    />
+                  )}
+                  {currentPage === "reports" && (
+                    <Reports
+                      reports={reports}
+                      activities={activities}
+                      programs={programs}
+                    />
+                  )}
+                  {currentPage === "join-us" && <Join />}
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+
+      {/* ==================== 3. MOBILE SIDE NAV DRAWER OVERLAY ==================== */}
+      <AnimatePresence>
+        {menuOpen && (
+          <div className="fixed inset-0 z-50 flex justify-start lg:hidden">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMenuOpen(false)}
+              className="absolute inset-0 bg-slate-955/40 backdrop-blur-xs"
+            />
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 220 }}
+              className="relative w-80 max-w-full h-full bg-gradient-to-b from-[#fafaf9] via-white to-[#f5f5f4] shadow-2xl flex flex-col justify-between p-6 border-r border-slate-150 z-10 text-left"
+            >
+              
+              <div className="space-y-6 text-left">
+                <div className="flex justify-between items-center pb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 shadow-sm bg-white p-0.5">
+                      <img src="/team_logo.jpg" alt="Logo" className="w-full h-full object-cover rounded-full" />
+                    </div>
+                    <div>
+                      <span className="font-display font-extrabold text-sm uppercase tracking-tight text-slate-950 block leading-none">Team Karthik</span>
+                      <span className="text-[7.5px] font-mono tracking-widest uppercase text-slate-400 font-bold block mt-0.5">TRS Student Wing</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setMenuOpen(false)}
+                    className="text-slate-400 hover:text-slate-800 p-1.5 rounded-lg hover:bg-slate-100/50 cursor-pointer transition-colors"
+                  >
+                    <X className="w-4.5 h-4.5" />
+                  </button>
+                </div>
+
+                <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
+                <nav className="flex flex-col gap-1">
+                  {navItems.map((item, idx) => {
+                    const Icon = item.icon;
+                    const isActive = currentPage === item.page && !isAdmin;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          navigateToPage(item.page);
+                          setMenuOpen(false);
+                        }}
+                        className={`group relative flex items-center justify-between pl-4 pr-3 py-3 rounded-xl transition-all duration-300 w-full text-left cursor-pointer ${
+                          isActive 
+                            ? "bg-slate-50 text-slate-950 font-bold" 
+                            : "text-[#475569] hover:bg-slate-955/[0.02] hover:text-slate-950"
+                        }`}
+                      >
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-r-md transition-all duration-300 ${isActive ? "h-6 bg-accent" : "h-0 group-hover:h-6 bg-accent/60"}`} />
+                        
+                        <div className="flex items-center gap-3.5">
+                          <Icon className={`w-4 h-4 transition-all duration-300 ${isActive ? "text-accent scale-105" : "text-slate-400 group-hover:text-slate-900 group-hover:scale-105"}`} />
+                          <span className={`text-[11px] font-display font-bold uppercase tracking-widest transition-colors ${isActive ? "text-slate-950" : "text-[#475569] group-hover:text-slate-955"}`}>
+                            {item.label}
+                          </span>
+                        </div>
+                        <span className={`text-[9px] font-mono transition-colors font-semibold ${isActive ? "text-accent" : "text-slate-350 group-hover:text-accent"}`}>
+                          {item.num}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              <div className="pt-6 border-t border-slate-150 space-y-4">
+                <button
+                  onClick={() => {
+                    handleAdminToggle();
+                    setMenuOpen(false);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className={`w-full font-mono font-bold text-[10px] uppercase tracking-widest py-3.5 rounded-xl transition-all duration-300 cursor-pointer text-center shadow-md ${
+                    isAdmin 
+                      ? "bg-amber-100 text-amber-900 hover:bg-amber-200/80 shadow-amber-900/5" 
+                      : "bg-slate-950 hover:bg-slate-900 text-white shadow-slate-900/10"
+                  } hover:scale-[1.01]`}
+                >
+                  {isAdmin ? "Exit Admin Desk" : "Admin Panel Access"}
+                </button>
+                <p className="text-[8.5px] font-mono text-slate-400 text-center leading-normal">
+                  Team Karthik Youth Coordinator Platform
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ==================== 4. ADMIN LOGIN MODAL ==================== */}
+      <AdminLoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onSuccess={handleLoginSuccess}
+      />
+
 
       {
     /* ==================== 4. GORGEOUS STABLE FOOTER ==================== */
@@ -459,12 +594,9 @@ export default function App() {
               <span>Grassroots Vetted</span>
               <span>•</span>
               <button
-    onClick={() => {
-      setIsAdmin(!isAdmin);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }}
-    className="flex items-center gap-1 hover:text-white cursor-pointer"
-  >
+                onClick={handleAdminToggle}
+                className="flex items-center gap-1 hover:text-white cursor-pointer"
+              >
                 <ShieldAlert className="w-3 h-3 text-accent" />
                 {isAdmin ? "Standard Mode" : "Admin Session"}
               </button>
@@ -473,6 +605,6 @@ export default function App() {
 
         </div>
       </footer>
-
-    </div>;
+    </div>
+  </div>;
 }

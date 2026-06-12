@@ -235,6 +235,68 @@ if (dbChanged) {
 
 const app = express();
 app.use(express.json());
+
+// Google Drive URL Auto-Converter helper
+function convertGDriveUrl(url: any): any {
+  if (typeof url !== "string") return url;
+  
+  // 1. Match file share URL e.g. drive.google.com/file/d/FILE_ID/view?usp=sharing
+  const fileIdMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileIdMatch && fileIdMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${fileIdMatch[1]}`;
+  }
+  
+  // 2. Match direct link or open link e.g. drive.google.com/open?id=FILE_ID
+  const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (idMatch && idMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
+  }
+  
+  return url;
+}
+
+// Deep object traversal for Google Drive links conversion
+function deepConvertGDrive(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  if (typeof obj === "string") {
+    return convertGDriveUrl(obj);
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(item => deepConvertGDrive(item));
+  }
+  if (typeof obj === "object") {
+    const res: any = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        res[key] = deepConvertGDrive(obj[key]);
+      }
+    }
+    return res;
+  }
+  return obj;
+}
+
+// Global middleware to auto-convert all incoming GDrive URLs
+app.use((req, res, next) => {
+  if (req.body) {
+    req.body = deepConvertGDrive(req.body);
+  }
+  next();
+});
+
+// Admin Login validation endpoint
+app.post("/api/admin/login", (req, res) => {
+  const { username, password } = req.body;
+  const expectedUser = process.env.ADMIN_USERNAME || "admin";
+  const expectedPass = process.env.ADMIN_PASSWORD || "teamkarthik2026";
+
+  if (username === expectedUser && password === expectedPass) {
+    res.json({ success: true, token: "session-token-karthik-trs" });
+  } else {
+    res.status(401).json({ success: false, error: "Invalid username or password" });
+  }
+});
+
 export { app };
 
   // 1. API: HEALTH CHECK

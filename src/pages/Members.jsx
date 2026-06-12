@@ -1,11 +1,40 @@
+import { motion } from "motion/react";
 import { Mail, Linkedin, Twitter, Users, Award, Code } from "lucide-react";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  show: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      type: "spring", 
+      stiffness: 100, 
+      damping: 15 
+    } 
+  }
+};
 
 export default function Members() {
   return (
-    <div className="pt-8 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 text-left">
+    <motion.div 
+      initial="hidden"
+      animate="show"
+      variants={containerVariants}
+      className="pt-8 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 text-left"
+    >
       
       {/* Header */}
-      <section className="text-center max-w-3xl mx-auto space-y-4">
+      <motion.section variants={itemVariants} className="text-center max-w-3xl mx-auto space-y-4">
         <span className="text-xs font-mono font-bold uppercase tracking-widest text-accent bg-amber-50 text-amber-800 px-3.5 py-1.5 rounded-full inline-block border border-amber-200">
           Active Leadership
         </span>
@@ -15,11 +44,11 @@ export default function Members() {
         <p className="text-slate-500 text-sm sm:text-base leading-relaxed font-sans max-w-2xl mx-auto">
           Dedicated student organizers and volunteers leading the youth empowerment and digital literacy movement at the grassroots.
         </p>
-      </section>
+      </motion.section>
 
       {/* Leadership Center Person */}
-      <section className="flex justify-center">
-        <div className="group bg-white border border-slate-200/90 rounded-3xl p-8 text-center shadow-lg hover:border-slate-350 transition-all duration-300 max-w-xl w-full relative overflow-hidden">
+      <motion.section variants={itemVariants} className="flex justify-center">
+        <div className="group bg-white border border-slate-200/90 rounded-3xl p-8 text-center shadow-lg hover:border-slate-350 transition-all duration-300 max-w-xl w-full relative overflow-hidden hover:scale-[1.01]">
           <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-accent via-rose-500 to-amber-500" />
           
           <div className="space-y-6 flex flex-col items-center">
@@ -30,7 +59,7 @@ export default function Members() {
                 alt="Karthik Yadav" 
                 className="w-full h-full object-cover" 
                 onError={(e) => {
-                  e.currentTarget.src = "/team_logo.jpg"; // Fallback just in case
+                  e.currentTarget.src = "/team_logo.jpg";
                 }}
               />
             </div>
@@ -54,17 +83,17 @@ export default function Members() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Core Team Grid (Suryachandra and Empty Placeholder) */}
-      <section className="space-y-6">
+      {/* Core Team Grid */}
+      <motion.section variants={itemVariants} className="space-y-6">
         <h2 className="text-center font-display font-bold text-lg text-slate-700 uppercase tracking-wider">
           Core Coordinators
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {/* Suryachandra */}
-          <div className="group bg-white border border-slate-200/80 rounded-3xl p-6 text-left shadow-premium hover:border-slate-350 transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
+          <div className="group bg-white border border-slate-200/80 rounded-3xl p-6 text-left shadow-premium hover:border-slate-350 transition-all duration-300 flex flex-col justify-between relative overflow-hidden hover:scale-[1.02]">
             <div className="absolute top-0 left-0 w-full h-[3px] bg-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             
             <div className="space-y-4">
@@ -88,8 +117,8 @@ export default function Members() {
           </div>
 
           {/* Placeholder for no other data */}
-          <div className="bg-slate-50/50 border border-dashed border-slate-300 rounded-3xl p-6 text-center flex flex-col items-center justify-center min-h-[200px] space-y-3">
-            <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+          <div className="bg-slate-50/55 border border-dashed border-slate-300 rounded-3xl p-6 text-center flex flex-col items-center justify-center min-h-[200px] space-y-3">
+            <div className="w-12 h-12 rounded-full bg-slate-105 border border-slate-200 flex items-center justify-center text-slate-450">
               <Users className="w-5 h-5" />
             </div>
             <div className="space-y-1">
@@ -100,10 +129,13 @@ export default function Members() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Vision Callout */}
-      <section className="bg-slate-100 border border-slate-200 rounded-3xl p-8 sm:p-12 overflow-hidden relative">
+      <motion.section 
+        variants={itemVariants}
+        className="bg-slate-100 border border-slate-200 rounded-3xl p-8 sm:p-12 overflow-hidden relative"
+      >
         <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full pointer-events-none blur-2xl" />
         <div className="max-w-2xl space-y-4 relative z-10">
           <span className="text-xs font-mono uppercase tracking-widest text-accent font-bold">Volunteer Driven</span>
@@ -112,8 +144,8 @@ export default function Members() {
             Team Karthik relies on active local student volunteers across institutions. Join us to help teach computer skills, organize survey campaigns, and build resource spaces in schools.
           </p>
         </div>
-      </section>
+      </motion.section>
 
-    </div>
+    </motion.div>
   );
 }

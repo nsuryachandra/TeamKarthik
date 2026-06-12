@@ -11,6 +11,29 @@ import {
   Shield,
   HelpCircle
 } from "lucide-react";
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  show: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      type: "spring", 
+      stiffness: 100, 
+      damping: 15 
+    } 
+  }
+};
+
 export default function Home({
   activities = [],
   updates = [],
@@ -144,12 +167,18 @@ export default function Home({
     /* ==================== 2. STATISTICS DASHBOARD ==================== */
   }
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
-          {
-    /* Stat 1 */
-  }
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-premium flex items-center gap-5 text-left hover:border-slate-300 transition-all duration-300">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        >
+          {/* Stat 1 */}
+          <motion.div
+            variants={itemVariants}
+            className="bg-white p-8 rounded-2xl border border-slate-200 shadow-premium flex items-center gap-5 text-left hover:border-slate-350 transition-all duration-300 hover:scale-[1.02]"
+          >
             <div className="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
               <Award className="w-7 h-7" />
             </div>
@@ -161,12 +190,13 @@ export default function Home({
                 Colleges Roamed
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {
-    /* Stat 2 */
-  }
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-premium flex items-center gap-5 text-left hover:border-slate-300 transition-all duration-300">
+          {/* Stat 2 */}
+          <motion.div
+            variants={itemVariants}
+            className="bg-white p-8 rounded-2xl border border-slate-200 shadow-premium flex items-center gap-5 text-left hover:border-slate-355 transition-all duration-300 hover:scale-[1.02]"
+          >
             <div className="w-14 h-14 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
               <HelpCircle className="w-7 h-7" />
             </div>
@@ -178,12 +208,13 @@ export default function Home({
                 Issues Logged
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {
-    /* Stat 3 */
-  }
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-premium flex items-center gap-5 text-left hover:border-slate-300 transition-all duration-300">
+          {/* Stat 3 */}
+          <motion.div
+            variants={itemVariants}
+            className="bg-white p-8 rounded-2xl border border-slate-200 shadow-premium flex items-center gap-5 text-left hover:border-slate-355 transition-all duration-300 hover:scale-[1.02]"
+          >
             <div className="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
               <Sparkles className="w-7 h-7" />
             </div>
@@ -195,9 +226,8 @@ export default function Home({
                 Instantly Solved
               </div>
             </div>
-          </div>
-
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {
@@ -212,13 +242,21 @@ export default function Home({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
           {highlights.map((h, i) => {
-    const Icon = h.icon;
-    return <div
-      key={i}
-      className="bg-white border border-slate-200/80 rounded-3xl p-6 text-left shadow-premium hover:border-slate-350 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
-    >
+            const Icon = h.icon;
+            return (
+              <motion.div
+                key={i}
+                variants={itemVariants}
+                className="bg-white border border-slate-200/80 rounded-3xl p-6 text-left shadow-premium hover:border-slate-350 hover:shadow-md transition-all duration-300 flex flex-col justify-between hover:scale-[1.02]"
+              >
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${h.color} border`}>
@@ -235,18 +273,20 @@ export default function Home({
                 </div>
 
                 <button
-      onClick={() => onNavigatePage(h.page)}
-      className="mt-6 flex items-center gap-1 text-xs font-mono font-bold text-accent hover:text-accent-dark cursor-pointer transition-colors"
-    >
+                  onClick={() => onNavigatePage(h.page)}
+                  className="mt-6 flex items-center gap-1 text-xs font-mono font-bold text-accent hover:text-accent-dark cursor-pointer transition-colors"
+                >
                   Enter Portal <ArrowRight className="w-3.5 h-3.5" />
                 </button>
-              </div>;
-  })}
+              </motion.div>
+            );
+          })}
 
-          {
-    /* Special Join Card to complete 3x2 grid */
-  }
-          <div className="bg-slate-950 text-white rounded-3xl p-6 text-left shadow-premium flex flex-col justify-between border border-slate-900">
+          {/* Special Join Card to complete 3x2 grid */}
+          <motion.div
+            variants={itemVariants}
+            className="bg-slate-950 text-white rounded-3xl p-6 text-left shadow-premium flex flex-col justify-between border border-slate-900 hover:scale-[1.02] transition-transform duration-300"
+          >
             <div className="space-y-4">
               <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-white/10 text-white border border-white/10">
                 <Shield className="w-5.5 h-5.5 text-accent" />
@@ -260,21 +300,26 @@ export default function Home({
             </div>
 
             <button
-    onClick={() => onNavigatePage("join-us")}
-    className="mt-6 w-full py-2.5 bg-accent hover:bg-accent-dark text-white rounded-xl font-mono font-bold text-xs uppercase tracking-wider cursor-pointer text-center transition-colors"
-  >
+              onClick={() => onNavigatePage("join-us")}
+              className="mt-6 w-full py-2.5 bg-accent hover:bg-accent-dark text-white rounded-xl font-mono font-bold text-xs uppercase tracking-wider cursor-pointer text-center transition-colors"
+            >
               Sign Up Now
             </button>
-          </div>
-
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {
     /* ==================== 4. LEADER BOARD BANNER ==================== */
   }
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-3xl p-8 sm:p-12 overflow-hidden relative border border-slate-850 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 text-left">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-3xl p-8 sm:p-12 overflow-hidden relative border border-slate-850 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 text-left"
+        >
           <div className="absolute top-0 right-0 w-80 h-80 bg-accent/10 rounded-full pointer-events-none blur-3xl" />
           <div className="space-y-4 max-w-xl relative z-10">
             <span className="text-xs font-mono uppercase tracking-widest text-accent font-bold">Launch Phase</span>
@@ -284,12 +329,12 @@ export default function Home({
             </p>
           </div>
           <button
-    onClick={() => onNavigatePage("join-us")}
-    className="shrink-0 px-8 py-3.5 bg-accent hover:bg-accent-dark text-white font-mono font-bold text-xs uppercase tracking-wider rounded-xl transition-all hover:scale-[1.01] shadow-lg cursor-pointer"
-  >
+            onClick={() => onNavigatePage("join-us")}
+            className="shrink-0 px-8 py-3.5 bg-accent hover:bg-accent-dark text-white font-mono font-bold text-xs uppercase tracking-wider rounded-xl transition-all hover:scale-[1.01] shadow-lg cursor-pointer"
+          >
             Join Coordinator Board
           </button>
-        </div>
+        </motion.div>
       </section>
 
     </div>;
