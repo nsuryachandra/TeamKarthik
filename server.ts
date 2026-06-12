@@ -286,8 +286,13 @@ app.use((req, res, next) => {
 // Admin Login validation endpoint
 app.post("/api/admin/login", (req, res) => {
   const { username, password } = req.body;
-  const expectedUser = process.env.ADMIN_USERNAME || "admin";
-  const expectedPass = process.env.ADMIN_PASSWORD || "teamkarthik2026";
+  const expectedUser = process.env.ADMIN_USERNAME;
+  const expectedPass = process.env.ADMIN_PASSWORD;
+
+  if (!expectedUser || !expectedPass) {
+    console.error("ADMIN_USERNAME or ADMIN_PASSWORD environment variable is missing.");
+    return res.status(500).json({ success: false, error: "Server authentication misconfigured" });
+  }
 
   if (username === expectedUser && password === expectedPass) {
     res.json({ success: true, token: "session-token-karthik-trs" });
