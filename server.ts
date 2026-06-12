@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import { createServer as createViteServer } from "vite";
 
 import dotenv from "dotenv";
 
@@ -936,24 +935,29 @@ Please write a structured event briefing in Markdown:
   // 8. Serve built assets in production / Vercel, otherwise mount Vite middlewares
   if (!process.env.VERCEL && process.env.NODE_ENV !== "production") {
     // Development mode: use Vite middlewares
-    createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    }).then((vite) => {
-      app.use(vite.middlewares);
-      const PORT = process.env.PORT || 3000;
-      app.listen(Number(PORT), "0.0.0.0", () => {
-        console.log(`Development server running on http://localhost:${PORT}`);
+    import("vite").then(({ createServer: createViteServer }) => {
+      createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+      }).then((vite) => {
+        app.use(vite.middlewares);
+        const PORT = process.env.PORT || 3000;
+        app.listen(Number(PORT), "0.0.0.0", () => {
+          console.log(`Development server running on http://localhost:${PORT}`);
+        });
+      }).catch((err) => {
+        console.error("Vite startup failed:", err);
       });
-    }).catch((err) => {
-      console.error("Vite startup failed:", err);
     });
   } else {
     // Production / Vercel: serve built static assets
     const distPath = path.join(ROOT_DIR, "dist");
     app.use(express.static(distPath));
-    // SPA fallback for non-API routes
+    // SPA fallback
     app.get("*", (req, res) => {
+      if (req.path.startsWith("/api/")) {
+        return res.status(404).json({ error: "API route not found" });
+      }
       res.sendFile(path.join(distPath, "index.html"));
     });
     // Start listening only when not on Vercel
