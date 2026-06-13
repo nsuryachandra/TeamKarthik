@@ -89,7 +89,7 @@ export default function Home({
       {
     /* ==================== 1. HERO SECTION ==================== */
   }
-      <section className="relative flex items-center justify-center pt-16 pb-12 overflow-hidden border-b border-slate-200/50 bg-white">
+      <section className="relative flex items-center justify-center pt-16 pb-12 overflow-hidden border-b border-slate-200/50 gold-mesh-gradient">
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full radial-glow-primary pointer-events-none -z-10" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 text-center space-y-8">
           
